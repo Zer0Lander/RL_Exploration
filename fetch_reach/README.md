@@ -62,7 +62,7 @@ of each episode and holds position for the rest.
 ## Reproduce
 
 ```bash
-uv venv && uv pip install -r requirements.txt
+source ../.venv/bin/activate       # shared env; see the top-level README for setup
 python train.py                                     # ~50k steps
 python plot.py runs/FetchReachDense_seed0/log.csv
 python record.py runs/FetchReachDense_seed0/best.pt # video of trained arm

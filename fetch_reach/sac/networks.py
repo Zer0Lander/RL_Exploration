@@ -8,10 +8,13 @@ counters the overestimation bias a single Q-network picks up from its own
 errors in the Bellman target.
 """
 
+import math
+
 import torch
 import torch.nn as nn
 
 LOG_STD_MIN, LOG_STD_MAX = -20.0, 2.0
+LOG2 = math.log(2.0)
 
 
 def mlp(in_dim: int, out_dim: int, hidden: int = 256) -> nn.Sequential:
@@ -26,7 +29,6 @@ class Actor(nn.Module):
     def __init__(self, obs_dim: int, act_dim: int):
         super().__init__()
         self.net = mlp(obs_dim, 2 * act_dim)  # outputs mean and log_std
-        self.act_dim = act_dim
 
     def forward(self, obs: torch.Tensor):
         """Sample an action and return (action, log_prob(action))."""
@@ -39,7 +41,7 @@ class Actor(nn.Module):
 
         # Correct the log-prob for the tanh squash (change of variables). This is
         # the numerically stable form of log(1 - tanh(u)^2).
-        log_prob = dist.log_prob(u) - (2 * (torch.log(torch.tensor(2.0)) - u - torch.nn.functional.softplus(-2 * u)))
+        log_prob = dist.log_prob(u) - 2 * (LOG2 - u - torch.nn.functional.softplus(-2 * u))
         return action, log_prob.sum(-1, keepdim=True)
 
     @torch.no_grad()
