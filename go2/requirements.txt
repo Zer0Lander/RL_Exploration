@@ -1,0 +1,5 @@
+torch
+gymnasium
+mujoco
+matplotlib
+imageio[ffmpeg]
